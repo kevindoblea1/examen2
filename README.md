@@ -1,5 +1,16 @@
 # Examen-MVVM · .NET MAUI (.NET 8)
 
+## Capturas
+<p align="center">
+  <img src="docs/img/ui-desktop.png" alt="Desktop" width="960" />
+</p>
+
+
+<p align="center">
+  <img src="docs/img/ui-android.png" alt="Android" width="340" />
+</p>
+
+
 ---
 
 ## Nota académica
@@ -40,6 +51,8 @@ A continuación se adjunta el **requerimiento oficial** (texto literal del enunc
 > **Diseño**  
 > - El diseño visual de la aplicación queda a criterio del desarrollador. Se valorará la claridad, legibilidad y usabilidad.
 >
+> - 
+>
 > **Repositorio**  
 > - El proyecto debe subirse a un repositorio, recuerde que el repositorio debe ser público, adjuntar enlace del mismo.
 >
@@ -58,8 +71,6 @@ A continuación se adjunta el **requerimiento oficial** (texto literal del enunc
 > | Campo de Subtotal (valor correcto, solo lectura) | 2% |  
 > | Campo de Descuento (valor correcto según los rangos, solo lectura) | 3% |  
 > | Campo de Total a pagar (valor correcto, solo lectura) | 2% |
-
-
 
 ## Descripción
 Aplicación **.NET MAUI (.NET 8)** para calcular el **descuento aplicado a la compra de tres productos** en una despensa, siguiendo rangos definidos. Implementa **MVVM** con **CommunityToolkit.Mvvm** y asegura que las entradas solo permitan números (teclado numérico y un **comportamiento** que filtra la entrada).
@@ -109,20 +120,15 @@ Aplicación **.NET MAUI (.NET 8)** para calcular el **descuento aplicado a la co
 
 ### CLI
 ```bash
-# Restaurar e inspeccionar
 dotnet restore
-
-# Compilar
 dotnet build
-
 # Ejecutar (ejemplo Windows/WinUI)
 dotnet build -t:Run -f net8.0-windows10.0.19041.0
-# Alternativas según plataforma
+# Alternativas
 # dotnet build -t:Run -f net8.0-android
 # dotnet build -t:Run -f net8.0-ios
 ```
-
-> Nota: Para iOS se requiere macOS. En Android, asegúrate de tener un emulador o dispositivo conectado.
+> Para iOS se requiere macOS. En Android, usa un emulador o dispositivo conectado.
 
 ---
 
@@ -139,154 +145,60 @@ Examen-Mvvm/
 │  └─ ComportamientoEntradaNumerica.cs
 ├─ ViewModels/
 │  └─ MainViewModel.cs
-├─ Resources/         # imágenes, fuentes, estilos (MAUI por defecto)
-├─ Platforms/         # Android, iOS, Windows
+├─ Resources/
+├─ Platforms/
 └─ (otros archivos MAUI por defecto)
 ```
 
 ---
 
 ## Arquitectura (MVVM)
-
 **View: `MainPage.xaml`**
-- 3 `Entry` con **teclado numérico** y `ComportamientoEntradaNumerica` (bloquea letras/espacios y permite un solo separador decimal).
-- Muestra **Subtotal**, **Descuento** y **Total** con `Label` (solo lectura).
+- `Entry` × 3 con teclado numérico + `ComportamientoEntradaNumerica`.
+- Labels de **Subtotal**, **Descuento** y **Total** (solo lectura).
 - Botones: **Calcular** y **Limpiar**.
-- Instancia el ViewModel en XAML mediante `ContentPage.BindingContext` (versión simple).
+- `BindingContext` al `MainViewModel` (en XAML).
 
 **ViewModel: `MainViewModel.cs`**
-- Propiedades de entrada (**string**) para validar sin excepciones.
-- Propiedades calculadas (**decimal** e **int**).
-- Comandos `CalcularCommand` y `LimpiarCommand` con `[RelayCommand]` (*CommunityToolkit.Mvvm*).
+- Entradas como `string`, resultados `decimal`/`int`.
+- `[RelayCommand]` para `Calcular` y `Limpiar`.
 
 **Comportamiento: `ComportamientoEntradaNumerica.cs`**
-- Restringe la entrada a **dígitos** y **un separador decimal** según la cultura actual (punto o coma).
-- Soporta **pegado** de texto, limpiándolo en tiempo real.
+- Restringe a dígitos y un separador decimal (según cultura).
+- Soporta pegado y limpia caracteres inválidos.
 
 ---
 
 ## Lógica de descuento
-- Subtotal en **[0.00, 999.99]**  → **0%**
-- Subtotal en **[1,000.00, 4,999.99]** → **10%**
-- Subtotal en **[5,000.00, 9,999.99]** → **20%**
-- Subtotal en **[10,000.00, 19,999.99]** → **30%**
-- Subtotal **≥ 20,000.00** → **0%**
+- [0.00, 999.99] → 0%
+- [1,000.00, 4,999.99] → 10%
+- [5,000.00, 9,999.99] → 20%
+- [10,000.00, 19,999.99] → 30%
+- ≥ 20,000.00 → 0%
 
-**Fórmula:**  
-`Total = Subtotal - (Subtotal * Descuento / 100)`
-
----
-
-## Validaciones
-- **Campos vacíos**: alerta y no calcula.
-- **Formato inválido** (no numérico): alerta y no calcula.
-- **Negativos**: alerta y no calcula.
-- **Filtro de entrada**: el comportamiento limpia cualquier carácter no permitido (letras, espacios, símbolos).  
-  Si el usuario escribe primero el separador decimal, se antepone **0** (ej.: `.5` → `0.5` o `0,5` según cultura).
-
-> **Cultura/Separador decimal**: la app respeta la cultura del dispositivo. En **es-HN** normalmente se usa **coma**.
+**Total = Subtotal - (Subtotal × Descuento / 100)**
 
 ---
 
 ## Casos de prueba manuales
-
-| Entrada (P1, P2, P3) | Subtotal  | % Desc. | Total esperado |
-|----------------------|-----------|---------|----------------|
-| 0, 0, 0              | 0.00      | 0%      | 0.00           |
-| 100, 200, 300        | 600.00    | 0%      | 600.00         |
-| 400, 300, 300        | 1,000.00  | 10%     | 900.00         |
-| 2,000, 2,000, 800    | 4,800.00  | 10%     | 4,320.00       |
-| 2,500, 2,500, 500    | 5,500.00  | 20%     | 4,400.00       |
-| 3,500, 3,500, 3,000  | 10,000.00 | 30%     | 7,000.00       |
-| 10,000, 5,000, 5,000 | 20,000.00 | 0%      | 20,000.00      |
-
----
-
-## Archivos principales (resumen)
-- **`MainPage.xaml`**: UI, teclado numérico y `ComportamientoEntradaNumerica` en los `Entry`. Instancia `MainViewModel` con `ContentPage.BindingContext`.
-- **`MainViewModel.cs`**: lógica de cálculo, validaciones y comandos.
-- **`ComportamientoEntradaNumerica.cs`**: filtro estricto de entrada numérica.
-- **`AppShell.xaml`**: registra `MainPage` como página inicial.
+| P1, P2, P3 | Subtotal | % | Total |
+|---|---:|---:|---:|
+| 0, 0, 0 | 0.00 | 0% | 0.00 |
+| 100, 200, 300 | 600.00 | 0% | 600.00 |
+| 400, 300, 300 | 1,000.00 | 10% | 900.00 |
+| 2,000, 2,000, 800 | 4,800.00 | 10% | 4,320.00 |
+| 2,500, 2,500, 500 | 5,500.00 | 20% | 4,400.00 |
+| 3,500, 3,500, 3,000 | 10,000.00 | 30% | 7,000.00 |
+| 10,000, 5,000, 5,000 | 20,000.00 | 0% | 20,000.00 |
 
 ---
 
 ## Instalación del paquete MVVM
-**Visual Studio (NuGet)**: instalar `CommunityToolkit.Mvvm`
-
-**CLI:**
 ```bash
 dotnet add package CommunityToolkit.Mvvm
 ```
 
 ---
 
-## Troubleshooting
-
-**Se pueden escribir letras**  
-Verifica el *xmlns* del comportamiento y su uso en cada `Entry`:
-```xml
-<!-- MainPage.xaml -->
-<ContentPage
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:comps="clr-namespace:Examen_Mvvm.Comportamientos"
-    xmlns:viewmodels="clr-namespace:Examen_Mvvm.ViewModels">
-
-    <ContentPage.BindingContext>
-        <viewmodels:MainViewModel />
-    </ContentPage.BindingContext>
-
-    <VerticalStackLayout Padding="16" Spacing="12">
-        <Entry Placeholder="Producto 1" Keyboard="Numeric">
-            <Entry.Behaviors>
-                <comps:ComportamientoEntradaNumerica />
-            </Entry.Behaviors>
-        </Entry>
-        <Entry Placeholder="Producto 2" Keyboard="Numeric">
-            <Entry.Behaviors>
-                <comps:ComportamientoEntradaNumerica />
-            </Entry.Behaviors>
-        </Entry>
-        <Entry Placeholder="Producto 3" Keyboard="Numeric">
-            <Entry.Behaviors>
-                <comps:ComportamientoEntradaNumerica />
-            </Entry.Behaviors>
-        </Entry>
-    </VerticalStackLayout>
-</ContentPage>
-```
-
-**No se actualizan los valores**  
-Asegura que el `BindingContext` esté configurado en `MainPage.xaml` (como en el ejemplo de arriba).
-
-**Separador decimal**  
-La app usa la cultura del dispositivo (coma o punto).
-
----
-
-## Publicación (GitHub)
-```bash
-git init
-git add .
-git commit -m "Examen-Mvvm: versión mínima funcional (MVVM + entrada numérica)"
-git branch -M main
-git remote add origin https://github.com/<tu-usuario>/Examen-Mvvm.git
-git push -u origin main
-```
-
----
-
-## Criterios de evaluación (mapeo)
-- **MVVM con CommunityToolkit.Mvvm**: `MainViewModel` + bindings + comandos → ✅
-- **Calcular (backend + UI)**: `CalcularCommand` → ✅
-- **Limpiar (backend + UI)**: `LimpiarCommand` → ✅
-- **Teclado numérico**: `Keyboard="Numeric"` + `ComportamientoEntradaNumerica` → ✅
-- **Tres campos de productos**: `Entry × 3` → ✅
-- **Subtotal (solo lectura)**: `Label` → ✅
-- **Descuento correcto (solo lectura)**: `Label` → ✅
-- **Total correcto (solo lectura)**: `Label` → ✅
-
----
-
 ## Licencia
-Proyecto para fines educativos. Puedes adaptar el contenido libremente citando la fuente del ejercicio si corresponde.
+Proyecto educativo.

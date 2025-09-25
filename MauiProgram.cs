@@ -1,25 +1,21 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CommunityToolkit.Mvvm; // Necesario por el paquete (genera code-behind)
+using Examen_Mvvm.ViewModels;
 
-namespace Examen_Mvvm
+namespace Examen_Mvvm;
+
+public static class MauiProgram
 {
-    public static class MauiProgram
+    public static MauiApp CreateMauiApp()
     {
-        public static MauiApp CreateMauiApp()
-        {
-            var builder = MauiApp.CreateBuilder();
-            builder
-                .UseMauiApp<App>()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+        var builder = MauiApp.CreateBuilder();
 
-#if DEBUG
-    		builder.Logging.AddDebug();
-#endif
+        builder
+            .UseMauiApp<App>();
 
-            return builder.Build();
-        }
+        // DI (Inyección de dependencias)
+        builder.Services.AddSingleton<MainViewModel>();
+        builder.Services.AddTransient<MainPage>(); // MainPage está en el namespace raíz
+
+        return builder.Build();
     }
 }

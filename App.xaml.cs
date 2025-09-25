@@ -1,12 +1,10 @@
-﻿namespace Examen_Mvvm
-{
-    public partial class App : Application
-    {
-        public App()
-        {
-            InitializeComponent();
+﻿namespace Examen_Mvvm;
 
-            MainPage = new AppShell();
-        }
+public partial class App : Application
+{
+    public App()
+    {
+        InitializeComponent();
+        MainPage = new AppShell();
     }
 }

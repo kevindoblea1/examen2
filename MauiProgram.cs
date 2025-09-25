@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm; // Necesario por el paquete (genera code-behind)
+﻿using CommunityToolkit.Mvvm; 
 using Examen_Mvvm.ViewModels;
 
 namespace Examen_Mvvm;
@@ -12,9 +12,9 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>();
 
-        // DI (Inyección de dependencias)
+  
         builder.Services.AddSingleton<MainViewModel>();
-        builder.Services.AddTransient<MainPage>(); // MainPage está en el namespace raíz
+        builder.Services.AddTransient<MainPage>(); 
 
         return builder.Build();
     }

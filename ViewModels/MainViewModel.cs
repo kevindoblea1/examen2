@@ -6,7 +6,6 @@ namespace Examen_Mvvm.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    // Entradas (como texto para validar y evitar excepciones)
     [ObservableProperty] private string product1;
     [ObservableProperty] private string product2;
     [ObservableProperty] private string product3;
@@ -20,7 +19,6 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task CalcularAsync()
     {
-        // Validación de vacíos
         if (string.IsNullOrWhiteSpace(Product1) ||
             string.IsNullOrWhiteSpace(Product2) ||
             string.IsNullOrWhiteSpace(Product3))
@@ -30,7 +28,6 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        // Parseo seguro respetando la cultura actual (coma o punto)
         var style = NumberStyles.Number;
         var culture = CultureInfo.CurrentCulture;
 
@@ -43,7 +40,6 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        // No permitir negativos
         if (p1 < 0 || p2 < 0 || p3 < 0)
         {
             await Application.Current!.MainPage!.DisplayAlert("Valores inválidos",
@@ -53,15 +49,12 @@ public partial class MainViewModel : ObservableObject
 
         Subtotal = p1 + p2 + p3;
 
-        // Regla de descuentos (según rangos)
         Descuento = GetDiscountPercentage(Subtotal);
 
-        // Total a pagar
         var descuentoMonto = Subtotal * Descuento / 100m;
         Total = Subtotal - descuentoMonto;
     }
 
-    // Botón: Limpiar
     [RelayCommand]
     private void Limpiar()
     {
@@ -79,7 +72,6 @@ public partial class MainViewModel : ObservableObject
         if (subtotal >= 5000m && subtotal <= 9999.99m) return 20;
         if (subtotal >= 10000m && subtotal <= 19999.99m) return 30;
         if (subtotal >= 20000m) return 0;
-        // L 0.00 a L 999.99 => 0
         return 0;
     }
 }

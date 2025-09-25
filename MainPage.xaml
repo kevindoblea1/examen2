@@ -2,6 +2,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:viewmodels="clr-namespace:Examen_Mvvm.ViewModels"
+    xmlns:comps="clr-namespace:Examen_Mvvm.Comportamientos"
     x:Class="Examen_Mvvm.MainPage"
     x:DataType="viewmodels:MainViewModel"
     Title="Cálculo de Descuento">
@@ -9,23 +10,35 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="14">
 
-            <!-- Entradas (teclado numérico) -->
+            <!-- Entradas: teclado numérico + Comportamiento que bloquea no numérico -->
             <Label Text="Producto 1" />
             <Entry Keyboard="Numeric"
                    Placeholder="0.00"
-                   Text="{Binding Product1}" />
+                   Text="{Binding Product1}">
+                <Entry.Behaviors>
+                    <comps:ComportamientoEntradaNumerica />
+                </Entry.Behaviors>
+            </Entry>
 
             <Label Text="Producto 2" />
             <Entry Keyboard="Numeric"
                    Placeholder="0.00"
-                   Text="{Binding Product2}" />
+                   Text="{Binding Product2}">
+                <Entry.Behaviors>
+                    <comps:ComportamientoEntradaNumerica />
+                </Entry.Behaviors>
+            </Entry>
 
             <Label Text="Producto 3" />
             <Entry Keyboard="Numeric"
                    Placeholder="0.00"
-                   Text="{Binding Product3}" />
+                   Text="{Binding Product3}">
+                <Entry.Behaviors>
+                    <comps:ComportamientoEntradaNumerica />
+                </Entry.Behaviors>
+            </Entry>
 
-            <!-- Resultados (solo lectura con Label) -->
+            <!-- Campos calculados (solo lectura con Label) -->
             <Label Text="Subtotal" FontAttributes="Bold" />
             <Label Text="{Binding Subtotal, StringFormat='L{0:N2}'}" />
 
@@ -36,12 +49,8 @@
             <Label Text="{Binding Total, StringFormat='L{0:N2}'}" />
 
             <!-- Botones -->
-            <Button Text="Calcular"
-                    Command="{Binding CalcularCommand}" />
-
-            <Button Text="Limpiar"
-                    Command="{Binding LimpiarCommand}"
-                    BackgroundColor="#EEEEEE" />
+            <Button Text="Calcular" Command="{Binding CalcularCommand}" />
+            <Button Text="Limpiar"  Command="{Binding LimpiarCommand}" BackgroundColor="#EEEEEE" />
 
         </VerticalStackLayout>
     </ScrollView>
